@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：必须与对应的接口全类名一致 UserMapper.java id ：必须与对应接口的某个对应的方法名一致即必须要和UserMapper.java接口中的方法同名。 -->
+
+<mapper namespace="com.jk.mapper.RoleMapper">
+
+	<resultMap id="user" type="com.jk.pojo.Role">
+		<id property="id" column="id" />
+		<result property="role_name" column="role_name" />
+		<result property="crea_user" column="crea_user" />
+		<result property="crea_time" column="crea_time" />
+	</resultMap>
+	
+	
+	<insert id="addRoleRole" parameterType="java.util.List">
+		INSERT INTO sys_root_org(root_id,org_id) VALUES
+		<foreach collection="list" item="role" separator=",">
+			(#{role.roleId},#{role.rowId})
+		</foreach>
+	</insert>
+	<insert id="save" parameterType="com.jk.pojo.Role" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_root(root_name,crea_user,crea_time) VALUES
+			(#{root_name},#{crea_user},#{crea_time})
+	</insert>
+
+    <delete id="delRoleRow" parameterType="String">
+		DELETE FROM sys_root_org WHERE root_id=#{id}
+	</delete>
+	
+    <delete id="delete" parameterType="Integer">
+		DELETE FROM sys_root WHERE id=#{id}
+	</delete>
+	
+</mapper>

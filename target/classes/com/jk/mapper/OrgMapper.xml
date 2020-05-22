@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：必须与对应的接口全类名一致 UserMapper.java id ：必须与对应接口的某个对应的方法名一致即必须要和UserMapper.java接口中的方法同名。 -->
+
+<mapper namespace="com.jk.mapper.OrgMapper">
+
+	<resultMap id="org" type="com.jk.pojo.Org">
+		<id property="id" column="id" />
+		<result property="org_name" column="org_name" />
+		<result property="url" column="url" />
+		<result property="fid" column="fid" />
+		<result property="state" column="state" />
+	</resultMap>
+	
+	
+	<insert id="add" parameterType="com.jk.pojo.Org" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_org(org_name,url,fid,state) VALUES
+			(#{org_name},#{url},#{fid},#{state})
+	</insert>
+	
+    <delete id="delete" parameterType="Integer">
+		DELETE FROM sys_org WHERE id=#{id}
+	</delete>
+	
+	<select id="queryOrg" resultMap="org" parameterType="com.jk.pojo.Org">
+		SELECT * FROM sys_org where 1=1 
+		<if test="fid!=null and fid!=''">
+		    and fid = #{fid}
+		</if>
+	</select> 
+	<select id="queryById" resultMap="org" parameterType="Integer">
+		SELECT * FROM sys_org where id = #{id}
+	</select> 
+	<update id="update"  parameterType="com.jk.pojo.Org">
+		update sys_org 
+		<set>
+	     	<if test="org_name!=null and org_name!= '' ">
+	     	       org_name=#{org_name},
+	     	</if>
+	     	<if test="url!=null and url!= '' ">
+	     	       url=#{url},
+	     	</if>
+	     	<if test="fid!=null and fid!= '' ">
+	     	       fid=#{fid},
+	     	</if>
+	     	<if test="state!=null and state!= '' ">
+	     	       state=#{state},
+	     	</if>
+     	</set>
+		where id = #{id}
+	</update> 
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：必须与对应的接口全类名一致 UserMapper.java id ：必须与对应接口的某个对应的方法名一致即必须要和UserMapper.java接口中的方法同名。 -->
+
+<mapper namespace="com.jk.mapper.invoiceMapper">
+   
+    <resultMap id="excamine" type="com.jk.pojo.Excamine">
+	
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		
+	</resultMap>
+	
+	
+	<resultMap id="invoice" type="com.jk.pojo.Invoice">
+		<id property="id" column="id" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="user_id" column="user_id" />
+		<result property="user_name" column="user_name" />
+		<result property="money" column="money" />
+		<result property="department" column="department" />
+		<result property="content" column="content" />
+		<result property="examine_time" column="examine_time" />
+		<result property="examine_name" column="examine_name" />
+	</resultMap>
+	
+	<select id="getExcamine" resultMap="excamine" parameterType="Integer">
+		SELECT * from sys_department
+	</select>
+	
+	<select id="getInvoice" resultMap="invoice" parameterType="Integer">
+		SELECT si.*,su.user_name,se.examine_time,se.user_name as examine_name from 
+		sys_invoice si left join sys_user su on si.user_id = su.id
+		left join (select se.*,su.user_name from sys_examine se left join sys_user su on se.user_id = su.id) se
+		on si.id = se.invoice_id
+	</select>
+	
+	<insert id="save">
+		INSERT INTO sys_invoice (type,status,user_id,money,department) 
+		VALUE(#{type},#{status},#{user_id},#{money},#{department})
+	</insert>
+	
+	<update id="update">
+     	update sys_invoice set status=#{status} where id = #{id}
+	</update>
+	
+	<insert id="saveExamine">
+		INSERT INTO sys_examine (invoice_id,user_id,examine_time,is_adopt,content) 
+		VALUE(#{invoice_id},#{user_id},#{examine_time},#{is_adopt},#{content})
+	</insert>
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jk.mapper.StudentMapper">
+	<!-- Result Map -->
+	<resultMap id="BaseResultMap" type="com.jk.pojo.Student">
+	    <result column="sid" property="sid"/>
+	    <result column="sname" property="sname"/>
+	    <result column="sage" property="sage"/>
+	    <result column="sphone" property="sphone"/>
+	    <result column="sedu" property="sedu"/>
+	    <result column="sjiguan" property="sjiguan"/>
+	    <result column="sparent" property="sparent"/>
+	    <result column="spaphone" property="spaphone"/>
+	    <result column="slive" property="slive"/>
+	    <result column="sdorm" property="sdorm"/>
+	</resultMap>
+	<resultMap id="BaseResultPayMap" type="com.jk.pojo.Pay">
+	    <result column="pid" property="pid"/>
+	    <result column="pname" property="pname"/>
+	    <result column="ptime" property="ptime"/>
+	    <result column="pamount" property="pamount"/>
+	    <result column="ptype" property="ptype"/>
+	    <result column="pform" property="pform"/>
+	    <result column="ispay" property="ispay"/>
+	</resultMap>
+
+	<!-- student table all fields -->
+	<sql id="Base_Column_List">
+		sid,sname,sage,sphone,sedu,sjiguan,sparent,spaphone,slive,sdorm
+	</sql>
+
+	<!-- 公共查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1
+		<if test="sid!=null ">and sid = #{sid}</if>
+		<if test="sname!=null and sname!=''">and sname = #{sname}</if>
+		<if test="sage!=null ">and sage = #{sage}</if>
+		<if test="sphone!=null ">and sphone = #{sphone}</if>
+		<if test="sedu!=null and sedu!=''">and sedu = #{sedu}</if>
+		<if test="sjiguan!=null and sjiguan!=''">and sjiguan = #{sjiguan}</if>
+		<if test="sparent!=null and sparent!=''">and sparent = #{sparent}</if>
+		<if test="spaphone!=null ">and spaphone = #{spaphone}</if>
+		<if test="slive!=null ">and slive = #{slive}</if>
+		<if test="sdorm!=null ">and sdorm = #{sdorm}</if>
+	</sql>
+
+	<!-- 添加记录（所有字段） -->
+	<insert id="add" parameterType="Object" >
+		insert into student (sid,sname,sage,sphone,sedu,sjiguan,sparent,spaphone,slive,sdorm)
+		values (#{sid},#{sname},#{sage},#{sphone},#{sedu},#{sjiguan},#{sparent},#{spaphone},#{slive},#{sdorm})
+	</insert>
+	
+	
+	<!-- 添加记录（所有字段） -->
+	<insert id="savePay" parameterType="com.jk.pojo.Pay" >
+		insert into pay (ptime,pname,pamount,ptype,pform,pamount_must)
+		value (#{ptime},#{pname},#{pamount},#{ptype},#{pform},#{pamount_must})
+	</insert>
+
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="Object">
+		update student
+		<set>
+			sid = #{sid},
+			sname = #{sname},
+			sage = #{sage},
+			sphone = #{sphone},
+			sedu = #{sedu},
+			sjiguan = #{sjiguan},
+			sparent = #{sparent},
+			spaphone = #{spaphone},
+			slive = #{slive},
+			sdorm = #{sdorm},
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="updateBySelective" parameterType="Object">
+		update student
+		<set>
+			<if test="sid != null  " >sid = #{sid},</if>
+			<if test="sname != null  and sname!=''" >sname = #{sname},</if>
+			<if test="sage != null  " >sage = #{sage},</if>
+			<if test="sphone != null  " >sphone = #{sphone},</if>
+			<if test="sedu != null  and sedu!=''" >sedu = #{sedu},</if>
+			<if test="sjiguan != null  and sjiguan!=''" >sjiguan = #{sjiguan},</if>
+			<if test="sparent != null  and sparent!=''" >sparent = #{sparent},</if>
+			<if test="spaphone != null  " >spaphone = #{spaphone},</if>
+			<if test="slive != null  " >slive = #{slive},</if>
+			<if test="sdorm != null  " >sdorm = #{sdorm},</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 删除记录 -->
+	<delete id="delete" parameterType="Object">
+		delete from student where id=#{id}
+	</delete>
+	
+	<update id="deleteFlagById" parameterType="Object" >
+		update student set delete_flag = 1 where id=#{id}
+	</update>
+	<update id="updatePay" parameterType="Object" >
+		update pay set ispay=#{ispay},pamount=${pamount},ptime=#{ptime},pform=#{pform} where pid=#{pid}
+	</update>
+
+	<!-- 根据id查询 -->
+	<select id="queryById" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" /> from student where delete_flag=0 and id=#{id}
+	</select>
+	
+	<select id="queryByPay" resultMap="BaseResultPayMap" parameterType="Object">
+		select * from pay where pname=#{id} 
+	</select>
+	<select id="queryByPayNow" resultMap="BaseResultPayMap" parameterType="Object">
+		select * from pay where pname=#{id} and date_format(ptime,'%Y-%m')=date_format(now(),'%Y-%m') and ptype=2
+	</select>
+
+	<!-- 列表总数 -->
+	<select id="queryByCount" resultType="java.lang.Integer" parameterType="Object">
+		select count(1) from student <include refid="Example_Where_Clause" />
+	</select>
+
+	<!-- 查询列表 -->
+	<select id="queryByList" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" /> from student <include refid="Example_Where_Clause" />
+	</select>
+	<!-- 查询列表 -->
+	<select id="queryPayByList" resultMap="BaseResultMap" parameterType="Object">
+		select s.*,p.*,c.cname as className from pay p left join student s on p.pname=s.sid
+		left join class c on s.class_id = c.cid
+		where
+		<if test="sid!=null and sid!=0">
+		 p.pname = #{sid} 
+		</if>
+		<if test="sid==0">
+		 p.ispay = 1
+		</if>
+		
+	</select>
+	<!-- 查询列表 -->
+	<select id="queryPaybingtu" resultType="com.jk.pojo.ListMap" parameterType="Object">
+		SELECT c.color,c.`cname` AS NAME,sc.coun/(SELECT COUNT(1) FROM (SELECT pname FROM pay  WHERE `ispay` = 0 GROUP BY pname) a ) * 100 AS VALUE FROM class c LEFT JOIN (
+		  SELECT class_id,COUNT(1) AS coun FROM student WHERE sid IN (SELECT pname FROM pay  WHERE `ispay` = 0 GROUP BY pname) GROUP BY class_id
+		) sc ON sc.class_id = c.`cid`  
+	</select>
+
+</mapper>
+
+

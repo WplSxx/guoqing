@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：必须与对应的接口全类名一致 UserMapper.java id ：必须与对应接口的某个对应的方法名一致即必须要和UserMapper.java接口中的方法同名。 -->
+
+<mapper namespace="com.jk.mapper.userMapper">
+
+	<resultMap id="user" type="com.jk.pojo.User">
+		<id property="id" column="id" />
+		<result property="user_name" column="user_name" />
+		<result property="pwd" column="pwd" />
+		<result property="nickname" column="nickname" />
+		<result property="crtime" column="crtime" />
+		<result property="uptime" column="uptime" />
+		<result property="youxiang" column="youxiang" />
+	</resultMap>
+	
+	<resultMap id="tree" type="com.jk.pojo.Tree">
+		<id property="id" column="id" />
+		<result property="org_name" column="org_name" />
+		<result property="url" column="url" />
+		<result property="fid" column="fid" />
+		<result property="state" column="state" />
+	</resultMap>
+	
+	<resultMap id="role" type="com.jk.pojo.Role">
+		<id property="id" column="id" />
+		<result property="root_name" column="root_name" />
+		<result property="crea_user" column="crea_user" />
+		<result property="crea_time" column="crea_time" />
+	</resultMap>
+	
+	<resultMap id="urole" type="com.jk.pojo.UserRole">
+		<result property="userid" column="userid" />
+		<result property="rootid" column="rootid" />
+	</resultMap>
+	
+	<select id="getRoot" resultMap="role">
+		SELECT id,root_name,crea_user,crea_time From sys_root
+	</select>
+	
+	<select id="getRootById" resultMap="role" parameterType="Integer">
+		SELECT r.id,r.root_name,r.crea_user,r.crea_time FROM sys_user u
+			LEFT JOIN sys_user_root ur ON u.id = ur.user_id
+			LEFT JOIN sys_root r ON ur.root_id = r.id
+			WHERE u.id = #{id}
+	</select>
+	
+	<delete id="delUserRole" parameterType="Integer">
+		DELETE FROM sys_user_root WHERE user_id=#{user_id}
+	</delete>
+	
+	
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM sys_user WHERE id=#{id}
+	</delete>
+	
+	
+	<insert id="addUserRole" parameterType="java.util.List">
+		INSERT INTO sys_user_root(user_id,root_id) VALUES
+		<foreach collection="list" item="a" separator=",">
+			(#{a.userid},#{a.rootid})
+		</foreach>
+	</insert>
+	
+	
+	<insert id="zhuce">
+		INSERT INTO sys_user (user_name,pwd,youxiang,nickname,crtime,uptime,isRegister) 
+		VALUE(#{user_name},#{pwd},#{youxiang},#{nickname},#{crtime},#{uptime},0)
+	</insert>
+	<update id="updateZhuce">
+     	update sys_user 
+     	<set>
+	     	<if test="isRegister!=null and isRegister!= '' ">
+	     	       isRegister=1,
+	     	</if>
+	     	<if test="user_name!=null and user_name!= '' ">
+	     	       user_name=#{user_name},
+	     	</if>
+	     	<if test="pwd!=null and pwd!= '' ">
+	     	       pwd=#{pwd},
+	     	</if>
+	     	<if test="nickname!=null and nickname!= '' ">
+	     	       nickname=#{nickname},
+	     	</if>
+	     	<if test="uptime!=null and uptime!= '' ">
+	     	       uptime=#{uptime},
+	     	</if>
+     	</set>
+     	 where 
+     	 <if test="id!=null and id!= '' ">
+     	      id = #{id}
+     	 </if>
+     	 <if test="id==null or id== '' ">
+     	     user_name=#{user_name}
+     	 </if>
+	</update>
+	
+	<!-- 五表联查 -->
+	<select id="getTree" resultMap="tree">
+		SELECT * FROM sys_org WHERE id IN(
+	    SELECT DISTINCT rj.org_id FROM sys_root_org rj WHERE root_id IN
+	      (SELECT ur.root_id FROM sys_user u
+	        LEFT JOIN sys_user_root ur ON u.id=ur.user_id  
+	        WHERE u.id=#{id})
+			)
+	</select> 
+	
+	
+	
+	<select id="queryRoleByUserId" resultMap="role" parameterType="Integer">
+			SELECT r.id,r.root_name,r.crea_user,r.crea_time FROM sys_user u
+			LEFT JOIN sys_user_root ur ON u.id = ur.user_id
+			LEFT JOIN sys_root r ON ur.root_id = r.id
+			WHERE u.id = #{id}
+	</select>
+	
+
+	<select id="queryUserByName" resultType="com.jk.pojo.User" parameterType="String">
+		SELECT id,user_name,pwd FROM sys_user where user_name=#{user_name}
+	</select>
+	
+	<select id="getUsers" resultMap="user">
+		SELECT id,user_name,pwd,nickname,crtime,uptime FROM sys_user 
+	</select> 
+	
+	 <select id="queryPower" resultMap="tree">
+		SELECT id,org_name,url,fid,state FROM sys_org 
+	</select> 
+	 
+	 <select id="getPowerByRid" resultMap="tree" parameterType="Integer">
+		SELECT p.id,p.org_name,p.url,p.fid,p.state FROM sys_org p
+		LEFT JOIN sys_root_org rp ON rp.org_id=p.id
+		WHERE rp.root_id=#{id}
+	 </select>
+	 
+	 <select id="queryuserdaochu" resultMap="user">
+		select * from sys_user
+	</select>
+	 <select id="queryByUser" resultMap="user">
+		select * from sys_user where id = #{id}
+	</select>
+</mapper>
