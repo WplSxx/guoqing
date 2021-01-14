@@ -74,7 +74,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.10-beta2</version>
+			<version>3.17</version>
 		</dependency>
 		<!-- 涓篜OI鏀寔Office Open XML -->
 		<dependency>
